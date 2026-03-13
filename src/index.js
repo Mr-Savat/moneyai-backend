@@ -8,9 +8,18 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://my-money-assistant.vercel.app'],
-  credentials: true
+  origin: [
+    'http://localhost:5173',
+    'https://localhost:5173',
+    'https://my-money-assistant.vercel.app'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.options(/.*/, cors());
+
 app.use(express.json());
 
 // Routes
@@ -22,10 +31,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'MoneyAI Backend is running' });
 });
 
-
 app.get('/', (req, res) => {
   res.json({ status: 'OK', message: 'MoneyAI Backend is running 🚀' });
 });
 
-// Start server
 module.exports = app;
