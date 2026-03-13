@@ -22,5 +22,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'MoneyAI Backend is running' });
 });
 
+
+app.get('/', (req, res) => {
+  res.json({ status: 'OK', message: 'MoneyAI Backend is running 🚀' });
+});
+
 // Start server
 module.exports = app;
