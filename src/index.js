@@ -24,7 +24,19 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
+const transactionsRoutes = require('./routes/transactions');
+const categoriesRoutes = require('./routes/categories');
+const userRoutes = require('./routes/users');
+const dashboardRoutes = require('./routes/dashboard');
+const forecastRoutes = require('./routes/forecast');
+
 app.use('/api/auth', authRoutes);
+app.use('/api/transactions', transactionsRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/forecast', forecastRoutes);
+
 
 // Test route
 app.get('/api/health', (req, res) => {
@@ -36,3 +48,14 @@ app.get('/', (req, res) => {
 });
 
 module.exports = app;
+
+
+const PORT = process.env.PORT || 5000;
+
+// Only start the server if this file is run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
+  });
+}
