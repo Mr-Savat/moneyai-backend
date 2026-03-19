@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyFirebaseToken } = require('../middleware/auth');
 const { db } = require('../config/firebase');
+const admin = require('firebase-admin');
 // GET /api/users/profile
 router.get('/profile', verifyFirebaseToken, async (req, res) => {
   try {
@@ -57,4 +58,38 @@ router.put('/profile', verifyFirebaseToken, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+router.delete('/profile', verifyFirebaseToken, async (req, res) => {
+  try {
+    const { uid } = req;
+
+    // Get all transactions
+    const transactions = await db.collection('transactions').where('userId', '==', uid).get();
+    
+    // Use a batch, but be mindful of the 500 limit
+    const batch = db.batch();
+    
+    transactions.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete the user document
+    const userDoc = db.collection('users').doc(uid);
+    batch.delete(userDoc);
+
+    // Commit the data deletion
+    await batch.commit();
+
+    // Finally, delete the Auth account
+    await admin.auth().deleteUser(uid);
+
+    res.json({ success: true, message: 'Account deleted successfully' });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.code === 'auth/user-not-found' ? 'User already deleted' : error.message 
+    });
+  }
+});
+
 module.exports = router;
